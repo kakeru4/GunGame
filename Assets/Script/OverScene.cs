@@ -25,10 +25,10 @@ public class OverScene : MonoBehaviour {
             SceneManager.LoadScene(OverSceneName);
         }
 
-        if (Input.GetButtonDown("Submit"))
-        {
-            SceneManager.LoadScene(SceneName);
-        }
+        //if (Input.GetButtonDown("Submit"))
+        //{
+        //    SceneManager.LoadScene(SceneName);
+        //}
 
     }
 }

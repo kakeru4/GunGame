@@ -24,10 +24,10 @@ public class ClearSceneChang : MonoBehaviour {
             SceneManager.LoadScene(ClearSceneName);
         }
 
-        if (Input.GetButtonDown("Submit"))
-        {
-            SceneManager.LoadScene(SceneName);
-        }
+        //if (Input.GetButtonDown("Submit"))
+        //{
+        //    SceneManager.LoadScene(SceneName);
+        //}
 
     }
 }
