@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerHpBarControl : MonoBehaviour {
+public class PlayerHpBarControl : MonoBehaviour
+{
 
     Slider slider;
     public float hp = 10f;
-    public GameObject Player;
+  
 
     void Start()
     {
@@ -28,7 +29,7 @@ public class PlayerHpBarControl : MonoBehaviour {
             hp -= 1.0f;
             //Destroy(Player);
         }
-        slider.value = hp;
+        //slider.value = hp;
     }
 
 }

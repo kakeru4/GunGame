@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems; //仮想スティック運用に必要
+using UnityEngine.UI;
 
-
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
     public float foreSpeed = 9.0f;
     public float backSpeed = 2.0f;
@@ -12,22 +13,23 @@ public class PlayerController : MonoBehaviour {
     public float jumpPower = 3.8f;
     public LayerMask GroundLayer; //指定レイヤー
     public Transform EnemyPos;
+    Slider slider;
+    private float JumpValue = 10f;
     Vector3 velocity;// 移動量
 
     Animator myAnim;//モーションツリー
     Rigidbody myRB;//リジッドボディ
-    //public GameObject Enemy;
-    
 
-    // Use this for initialization
-    void Start () {
+
+    void Start()
+    {
         myRB = GetComponent<Rigidbody>();
         myAnim = GetComponent<Animator>();
+        slider = GameObject.Find("JumpSlider").GetComponent<Slider>();
         myAnim.speed = 1.5f;
-        myRB.useGravity = false;
-	}
+        myRB.useGravity = true;
+    }
 
-    // Update is called once per frame
     void Update()
     {
         float h;
@@ -38,16 +40,19 @@ public class PlayerController : MonoBehaviour {
         h = Input.GetAxis("Horizontal");
         v = Input.GetAxis("Vertical");
         mx = Input.GetAxis("Mouse X");
-        my= Input.GetAxis("Mouse Y");
+        my = Input.GetAxis("Mouse Y");
 
 
 
         myAnim.SetFloat("Speed", v);
-       // myAnim.SetFloat("Speed", h);
+        // myAnim.SetFloat("Speed", h);
         myAnim.SetFloat("Direction", mx);
         myAnim.SetFloat("Direction", my);
         velocity = new Vector3(h, 0, v);
         velocity = transform.TransformDirection(velocity);
+
+        //Debug.Log(JumpValue);
+        slider.value = JumpValue;
 
         if (v > 0.1)
         {
@@ -57,15 +62,6 @@ public class PlayerController : MonoBehaviour {
         {
             velocity *= backSpeed;
         }
-
-        //if(mx > 1.0)
-        //{
-
-        //}
-        //else if(mx > -1.0)
-        //{
-
-        //}
 
 
         transform.localPosition += velocity * Time.deltaTime;
@@ -78,12 +74,31 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKey(KeyCode.Space))
         {
             myRB.useGravity = false;
-            transform.localPosition += new Vector3(0,0.2f,0);
+            transform.localPosition += new Vector3(0, 0.2f, 0);
             StartCoroutine("JumpAction");
+
         }
+
+        if (!myRB.useGravity)
+        {
+            JumpValue -= 0.1f;
+        }
+
+        if (JumpValue <= 0)
+        {
+            myRB.useGravity = true;
+            transform.localPosition += new Vector3(0, -0.2f, 0);
+        }
+
+        if (IsGround())
+        {
+            JumpValue = 10f;
+        }
+
         if (Input.GetKey(KeyCode.M))
         {
             myRB.useGravity = true;
+            AvoidEmergencies();
         }
     }
 
@@ -94,6 +109,11 @@ public class PlayerController : MonoBehaviour {
     transform.position + Vector3.up * 0.5f, 0.05f, -Vector3.up, out hit, 0.55f, GroundLayer);
     }
 
+    //緊急回避する関数
+    void AvoidEmergencies()
+    {
+        myAnim.SetTrigger("Avoid");
+    }
 
     IEnumerator JumpAction()
     {
@@ -101,10 +121,11 @@ public class PlayerController : MonoBehaviour {
         {
             if (!myRB.useGravity)
             {
-               
+
                 myAnim.SetTrigger("Jump");
+                //* Time.deltaTime;
                 yield return new WaitForSeconds(0.15f);
-               // myRB.AddForce(new Vector3(0, jumpPower, 0), ForceMode.Impulse);
+                // myRB.AddForce(new Vector3(0, jumpPower, 0), ForceMode.Impulse);
             }
         }
     }

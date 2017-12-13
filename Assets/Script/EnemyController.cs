@@ -50,6 +50,7 @@ namespace StateMachine
         {
             Initialize();
         }
+
         public void Initialize()
         {
             // 始めにプレイヤーの位置を取得できるようにする

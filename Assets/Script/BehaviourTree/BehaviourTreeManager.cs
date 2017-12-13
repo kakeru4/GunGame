@@ -37,7 +37,7 @@ namespace BehaviourTrees
 
         Vector3 pos;
 
-        LayerMask layerMask;
+        LayerMask BoxLayer = 1 << 9;
 
         bool IsAttack;
 
@@ -51,7 +51,7 @@ namespace BehaviourTrees
 
         bool IsStop = false;
 
-        private float ShortSqrDistance = 60f;
+        private float ShortSqrDistance = 75f;
 
         private float LongSqrDistance = 150f;
 
@@ -147,7 +147,9 @@ namespace BehaviourTrees
             if (IsAttack)
             {
                 float sqrDistanceToPlayer = Vector3.SqrMagnitude(transform.position - Player.position);
+
                 Debug.Log(sqrDistanceToPlayer);
+
                 if (sqrDistanceToPlayer < ShortSqrDistance)
                 {
                     IsSliding = true;
@@ -170,15 +172,16 @@ namespace BehaviourTrees
 
         private ExecutionResult PlayerDiscover(BehaviourTreeInstance instance)
         {
-           
-            if(Physics.Linecast(transform.position, target.transform.position, 1<<9))
+            float sqrDistanceToPlayer = Vector3.SqrMagnitude(transform.position - Player.position);
+
+            if (Physics.Linecast(transform.position, target.transform.position, BoxLayer))
             {
                 //見えない
                 Debug.Log("何も発見できていないよー。");
                 IsAttack = false;
                 return new ExecutionResult(false);
             }
-           else 
+           else if(sqrDistanceToPlayer <= 300)
             {
                 //見える
                 Debug.Log("プレイヤーを発見");
@@ -187,14 +190,14 @@ namespace BehaviourTrees
                 return new ExecutionResult(true);
             }
 
-            
+            return new ExecutionResult(false);
         }
 
         private ExecutionResult BuildingDiscover(BehaviourTreeInstance instance)
         {
             if(obj!=null)
             {
-                if (Physics.Linecast(transform.position, obj.transform.position, 1 << 9))
+                if (Physics.Linecast(transform.position, obj.transform.position, BoxLayer))
                 {
                     //見える
                     Debug.Log("建物発見");
@@ -219,12 +222,12 @@ namespace BehaviourTrees
 
             //エージェントが現目標地点に近づいてきたら、
             //次の目標地点を選択します
-            if (!agent.pathPending && agent.remainingDistance < 0.5f)
+            if (!agent.pathPending && agent.remainingDistance < 2.0f)
             {
                 GotoNextPoint();
             }
 
-            Debug.Log("歩いてるよー");
+            Debug.Log(agent.remainingDistance);
             return new ExecutionResult(false);
         }
 
@@ -239,7 +242,10 @@ namespace BehaviourTrees
         {
             // 地点がなにも設定されていないときに返します
             if (points.Length == 0)
+            {
                 return;
+            }
+
 
             //エージェントが現在設定された目標地点に行くように設定します
             agent.destination = points[destPoint].position;
@@ -247,6 +253,7 @@ namespace BehaviourTrees
             // 配列内の次の位置を目標地点に設定し、
             // 必要ならば開始にもどります
             destPoint = (destPoint + 1) % points.Length;
+            Debug.Log("通過");
         }
 
         private ExecutionResult AttackBuilding(BehaviourTreeInstance instance)
